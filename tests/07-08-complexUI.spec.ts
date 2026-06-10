@@ -93,4 +93,45 @@ test.describe('Nested frames and iFrames', () => {
         await nestedFrames.assertFrameContains('frame-middle', 'MIDDLE');
         await nestedFrames.assertFrameContains('frame-right', 'RIGHT');
     });
+test('confirm dialog - user accepts', async ({ page }) => {
+        const alertsPage = new AlertsPage(page);
+        await alertsPage.goto();
+
+        const dialogPromise = page.waitForEvent('dialog');
+        alertsPage.clickConfirmButton();
+        const dialog = await dialogPromise;
+
+        await alertsPage.assertDialogType(dialog, 'confirm');
+        await dialog.accept();
+
+        await alertsPage.assertResult('You clicked: Ok');
+    });
+
+    test('confirm dialog - user dismisses', async ({ page }) => {
+        const alertsPage = new AlertsPage(page);
+        await alertsPage.goto();
+
+        const dialogPromise = page.waitForEvent('dialog');
+        alertsPage.clickConfirmButton();
+        const dialog = await dialogPromise;
+
+        await alertsPage.assertDialogType(dialog, 'confirm');
+        await dialog.dismiss();
+
+        await alertsPage.assertResult('You clicked: Cancel');
+    });
+
+    test('prompt dialog - user enters text and accepts', async ({ page }) => {
+        const alertsPage = new AlertsPage(page);
+        await alertsPage.goto();
+
+        const dialogPromise = page.waitForEvent('dialog');
+        alertsPage.clickPromptButton();
+        const dialog = await dialogPromise;
+
+        await alertsPage.assertDialogType(dialog, 'prompt');
+        await dialog.accept('This is an input for the prompt dialog!');
+
+        await alertsPage.assertResult('You entered: asd');
+    });
 });
